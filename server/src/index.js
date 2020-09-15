@@ -65,9 +65,6 @@ server.applyMiddleware({
     path: graphqlPath,
 })
 // Route
-app.get('/', (req, res) => {
-    res.send('Hello world');
-})
 
 
 // PORT

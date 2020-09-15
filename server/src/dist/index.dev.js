@@ -77,10 +77,7 @@ server.applyMiddleware({
   app: app,
   path: graphqlPath
 }); // Route
-
-app.get('/', function (req, res) {
-  res.send('Hello world');
-}); // PORT
+// PORT
 
 var PORT = process.env.PORT || 5000; // Run server
 
