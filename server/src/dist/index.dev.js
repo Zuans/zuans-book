@@ -64,10 +64,10 @@ app.use('/img-card', express["static"](path.join(__dirname, 'images/img-card')))
 
 if (process.env.NODE_ENV = 'production') {
   // static folder
-  app.use(express["static"](__dirname + '/public/')); // handle SPA
+  app.use(express["static"](__dirname + '../public/')); // handle SPA
 
   app.get(/.*/, function (req, res) {
-    return res.sendFile(__dirname + '/public/index.html');
+    return res.sendFile(__dirname + '../public/index.html');
   });
 } // Graphql
 //// Endpoint
