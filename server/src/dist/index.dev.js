@@ -82,7 +82,7 @@ app.get('/', function (req, res) {
   res.send('Hello world');
 }); // PORT
 
-var PORT = process.env.PORT; // Run server
+var PORT = process.env.PORT || 5000; // Run server
 
 app.listen(PORT, function () {
   console.log("Server Running on port ".concat(PORT));
