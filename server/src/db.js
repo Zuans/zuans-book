@@ -8,6 +8,7 @@ const connectDB = async () => {
         await mongoose.connect(`mongodb+srv://juan123:${process.env.PASSWORD}@cluster0.npqqt.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
+            useCreateIndex: true,
         })
         console.log('Connect to db');
     } catch (error) {
