@@ -5,15 +5,16 @@ dotenv.config();
 
 const connectDB = async () => {
     try {
-        await mongoose.connect(`mongodb+srv://juan123:${process.env.PASSWORD}@cluster0.npqqt.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-            useCreateIndex: true,
+        await mongoose.connect('mongodb://localhost:10115/zuans-books',{
+            useNewUrlParser : true,
+            useUnifiedTopology : true,
+            useFindAndModify : false,
         })
         console.log('Connect to db');
     } catch (error) {
+        console.log('Cannot connect to db retry in 5 seconds');
+        setTimeout(connectDB,5000);
         console.log(error);
-        process.exit(1);
     }
 }
 

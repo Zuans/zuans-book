@@ -36,6 +36,10 @@ const server = new ApolloServer({
         req,
         res
     }),
+    uploads :{
+        maxFieldSize : 20000000,
+        maxFileSize : 20000000,
+    }
 })
 
 // Middleware
@@ -48,7 +52,8 @@ app.use('/img-avatar', express.static(path.join(__dirname, 'images/img-avatar'))
 app.use('/img-card', express.static(path.join(__dirname, 'images/img-card')));
 
 // handle production
-if (process.env.NODE_ENV = 'production') {
+if (process.env.NODE_ENV === 'production') {
+    console.log('production');
     // static folder
     app.use(express.static(path.join(__dirname, '../public/')));
 
