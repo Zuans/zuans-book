@@ -7,7 +7,7 @@ const connectDB = async (key,name) => {
     console.log(name);
     console.log(key);
     try {
-        await mongoose.connect(`mongodb+srv://juan123:${key}@cluster0.npqqt.mongodb.net/${key}?retryWrites=true&w=majority`,{
+        await mongoose.connect(`mongodb+srv://juan123:${key}@cluster0.npqqt.mongodb.net/${name}?retryWrites=true&w=majority`,{
             useNewUrlParser : true,
             useUnifiedTopology : true,
             useFindAndModify : false,
