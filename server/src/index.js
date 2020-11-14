@@ -18,7 +18,9 @@ const isAuth = require('./middleware/is-auth');
 
 // Connect db
 const connectDB = require('./db');
-connectDB();
+const keyDB = process.env.PASSWORD || null ;
+const nameDB = process.env.DB_NAME || null ;
+connectDB(keyDB,nameDB);
 
 // Import schema typeDefs and path for graphql
 const typeDefs = require('./apollo-graphql/typeDefs');
