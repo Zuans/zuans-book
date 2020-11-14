@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const connectDB = async (key,name) => {
+    console.log(key,name);
     try {
         await mongoose.connect(`mongodb+srv://juan123:${key}@cluster0.npqqt.mongodb.net/${name}?retryWrites=true&w=majority`,{
             useNewUrlParser : true,
