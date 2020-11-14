@@ -515,6 +515,7 @@ const resolvers = {
             author_id,
             photo
         }) {
+            console.log('add nbook function trigger');
             // img uploaded
             const hasImg = await photo;
             try {
