@@ -14,7 +14,9 @@ const connectDB = async (key,name) => {
         console.log('Connect to db');
     } catch (error) {
         console.log('Cannot connect to db retry in 5 seconds');
-        setTimeout(connectDB(key,name),5000);
+        setTimeout( async () => {
+            await connectDB(key,name);
+        },5000);
         console.log(error);
     }
 }
