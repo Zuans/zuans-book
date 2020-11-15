@@ -107,7 +107,7 @@ const typeDefs = gql `
     }
 
     type Mutation {
-        addBook(username: String!, genre: String!, description: String, user_add: String ,photo: Upload, author_id: String! ): Book!
+        addBook(name: String!, genre: String!, description: String, user_add: String ,photo: Upload, author_id: String! ): Book!
         addUser(username : String!, email: String!, avatar: Upload, password: String!): User!
         addVisitor: Amount
         updateBook(bookId:String!, name : String!, genre: String!, description: String, author_id:String, imgDefault:Boolean, photo : Upload ):Book

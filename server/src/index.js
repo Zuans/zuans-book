@@ -20,7 +20,6 @@ const isAuth = require('./middleware/is-auth');
 const connectDB = require('./db');
 const keyDB = process.env.PASSWORD;
 const nameDB = process.env.DB_NAME;
-console.log(keyDB,nameDB,'this in index js');
 connectDB(keyDB,nameDB);
 
 // Import schema typeDefs and path for graphql

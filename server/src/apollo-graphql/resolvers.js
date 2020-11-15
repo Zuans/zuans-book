@@ -658,6 +658,7 @@ const resolvers = {
         },
 
         async deleteBook(root,{ bookId }) {
+            console.log('Work');
             try {
                 const delBook = await Book.findById(bookId);
                 const filename = delBook.photo.filename;
