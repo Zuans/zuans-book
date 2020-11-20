@@ -21,7 +21,8 @@ const shortid = require('shortid');
 
 // Import helper
 
-const { 
+const {
+    sendEmailVerify, 
     sendLog, 
     compareDay, 
     getGenre,
@@ -320,9 +321,13 @@ const resolvers = {
             const user = await User.findOne({
                 email
             })
-            if (!user) return new Error("User doesn't exist!");
+            if (!user) return new Error("USER_NOT_EXIST");
             const isEqual = await bcrypt.compare(password, user.password);
-            if (!isEqual) return new Error("Password Doens't match!");
+            if (!isEqual) return new Error("PASSWORD_NOT_MATCH");
+            if(!user.verify) {
+                await sendEmailVerify(user);
+                return new Error('VERIFY_EMAIL');
+            }
             const token = jwt.sign({
                 user: user._id,
                 email: user.email,
@@ -478,6 +483,34 @@ const resolvers = {
             }
         },
 
+
+        async verifyUser(root,{
+            token
+        }) {
+    try {
+                const decodeToken = await jwt.verify(token,process.env.TOKEN_SECRET);
+                if(!decodeToken)  throw new Error('VERIFY_ACCOUNT_FAILED');
+                const password = decodeToken.password;
+                const userId = decodeToken.id;
+                await User.updateOne(
+                    { _id : userId },
+                    {
+                        $set : {
+                            verify : true
+                        }
+                    }
+                );
+                const user = await User.findById(userId);
+                // remove hashing password from db
+                user.password = password;
+                if(!user) throw new Error('USER_NOT_FOUND');
+                return user;
+            } catch(err) {
+                console.log(err);
+                throw new Error(err);
+            }
+        },
+
         async verifyAdmin(root,{
             password
         },{
@@ -503,7 +536,7 @@ const resolvers = {
             } catch(err) {
                 console.log(err);
             }
-        }
+        },
     },
 
     Mutation: {
@@ -570,14 +603,23 @@ const resolvers = {
                     email,
                     password: hashPassword,
                     user_type: 'user',
+                    verify : false,
                     avatar: {
                         filename: avatarData.filename,
                     },
                 });
                 const description = `${username} has signed up`;
+                await user.save();
                 await sendLog(description);
-                return await user.save();
+                sendEmailVerify({
+                    id : user._id,
+                    username,
+                    email,
+                    password,
+                });
+                return user;
             } catch (error) {
+                console.log(avatarData.filename);
                 const path = Path.join(__dirname, `../images/${dirImg}/${avatarData.filename}`);
                 if (avatarImg) await unlinkSync(path,
                     function (err) {
@@ -867,6 +909,15 @@ const resolvers = {
                     "user_type" : "admin" 
                 });
                 if(!admin) throw new Error("You aren't admin ");
+
+                // check if new email is already used
+                const isExist = await User.findOne({
+                    "_id" : {
+                        $ne : userId,
+                    },
+                    email : email,
+                })
+                if ( isExist ) throw new Error('EMAIL_ALREADY_EXIST');
                 const filter = { _id : userId };
                 // Hashing the password
                 const getSalt = await bcrypt.genSalt(10);
@@ -877,7 +928,8 @@ const resolvers = {
                         const update = new User({
                             username,
                             email,
-                            password : hashPassword
+                            password : hashPassword,
+                            verify : false
                         });
                         const upsertData = update.toObject();
                         delete upsertData._id
@@ -906,7 +958,8 @@ const resolvers = {
                         password : hashPassword,
                         avatar : {
                             filename : imgData.filename,
-                        }
+                        },
+                        verify : false,
                     }
                     const { ok } = await User.updateOne(
                         { "_id" : userId },
@@ -920,6 +973,7 @@ const resolvers = {
                         username,
                         email,
                         password : hashPassword,
+                        verify : false,
                     }
                     const { ok } = await User.updateOne(
                         { _id : userId },
@@ -927,12 +981,51 @@ const resolvers = {
                           "$unset" : { avatar : 1 }
                         },
                     );
-                    if(!ok) throw new Error('Error when updating! ')
+                    if(!ok) throw new Error('Error when updating! ');
+                    return await User.findById(userId);
                 }
             } catch(err) {
                 console.log(err);
-            } finally {
-                return await User.findById(userId);
+                throw new Error(err);
+            }
+        },
+
+        async updateEmail(root,{
+            email,
+            password,
+            newEmail,
+        }) {
+            try {
+                const exist = await User.findOne({
+                    "email" : newEmail
+                });
+                if(exist) return new Error('EMAIL_DUPLICATE');
+                const user = await User.findOne({
+                    "email" : email
+                });
+                if(!user) return new Error('USER_NOT_EXIST')
+                const isValid = await bcrypt.compare(password,user.password);
+                if(!isValid) return new Error('PASSWORD_NOT_MATCH');
+                await User.updateOne(
+                    { "email" : email },
+                    { "$set" : {
+                        "email" : newEmail
+                    }}
+                );
+                const userData = {
+                    id : user._id,
+                    username : user.username,
+                    password,
+                    email : newEmail,
+                }
+                await sendEmailVerify({...userData});
+                return {
+                    success : true,
+                    error : false,
+                }
+            } catch(err) {
+                console.log(err);
+                return new Error(err);
             }
         }
     },

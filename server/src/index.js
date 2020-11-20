@@ -7,9 +7,9 @@ const path = require('path');
 const {
     ApolloServer
 } = require('apollo-server-express');
-const {
-    makeExecutableSchema
-} = require('graphql-tools');
+// const {
+//     makeExecutableSchema
+// } = require('graphql-tools');
 
 
 
@@ -27,6 +27,9 @@ const typeDefs = require('./apollo-graphql/typeDefs');
 const resolvers = require('./apollo-graphql/resolvers');
 const graphqlPath = '/graphql';
 
+const { graphqlError } = require('./error');
+
+
 // Make apollo server
 const server = new ApolloServer({
     typeDefs,
@@ -38,6 +41,29 @@ const server = new ApolloServer({
         req,
         res
     }),
+    formatError : (err) => {
+        const errMsg = err.message.split(":");
+        // If err is custom error msg
+        if(errMsg.length <= 1 ) {
+            const error = graphqlError(err.message);
+            if(!error) {
+                return {
+                    message : 'Server internal error',
+                    statusCode : 500,
+                }
+            }
+            return error;
+        } else {
+            const baseError = {
+                JsonWebTokenError : {
+                    message : 'Error Invalid Token',
+                    statusCode : 403,
+                },
+            }
+            const error =  baseError[errMsg[0]] || err;
+            return error;
+        }
+    },
     uploads :{
         maxFieldSize : 20000000,
         maxFileSize : 20000000,

@@ -26,6 +26,9 @@ const UserSchema = new mongoose.Schema({
             type: String
         }
     },
+    verify : {
+        type : Boolean,
+    },
     user_type: String,
     likedBook_id: [],
 })

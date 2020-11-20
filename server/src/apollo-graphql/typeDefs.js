@@ -46,6 +46,7 @@ const typeDefs = gql `
         avatar : File
         user_type : String
         likedBook : [Book]
+        user_token : String,
     }
 
     type PageInfo {
@@ -100,6 +101,7 @@ const typeDefs = gql `
         authUser(email: String!, password: String!): AuthUser!
         logoutUser( description : String ): LogDesc
         verifyAdmin(password: String): Status
+        verifyUser( token:String!): User
         allLogs: [LogDesc!]
         manyBooks: [Amount]!
         manyVisitor: [Amount]!
@@ -120,6 +122,7 @@ const typeDefs = gql `
         addGenre(name: String!): Genre!
         deleteGenre(genreId: String!): Status
         updateAdmin(username: String!, email:String!, password: String!, avatar: Upload, imgDefault: Boolean ):User
+        updateEmail( email: String!, password: String!, newEmail: String! ):Status
     }
 
 `

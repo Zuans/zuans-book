@@ -4,6 +4,15 @@ const Logs = require('../model/logs');
 const Visitor = require('../model/visitor');
 const Genre = require('../model/genre');
 
+const nodemailer = require('nodemailer');
+const dotenv = require('dotenv').config();
+const mustache = require('mustache');
+const { readFileSync } = require('fs');
+const path = require('path');
+const jwt = require('jsonwebtoken');
+
+
+
 const sendLog = async (description) => {
     console.log('log Worked')
     try {
@@ -14,6 +23,56 @@ const sendLog = async (description) => {
     } catch(err) {
         console.log(err)
         return new Error(err);
+    }
+}
+
+
+const genereteToken = async ( id,email,password ) => {
+    const token = await jwt.sign({
+        id,
+        email,
+        password,
+    },process.env.TOKEN_SECRET,{
+        expiresIn : '2h',
+    });
+    return token;
+}
+
+const sendEmailVerify = async (user) => {
+    try {
+        const template = await readFileSync(path.join(__dirname,'../template/email.html'),'utf8');
+        const pass = process.env.EMAIL_PASS;
+        const configMail = {
+            service : 'gmail',
+            auth : {
+                user : 'juandev.net@gmail.com',
+                pass : pass,
+            }
+        };
+
+        const {
+            username ,
+            email
+        } = user;
+
+        const token = await genereteToken(user.id,user.email,user.password);
+
+        const varTemp = {
+            username,
+            email,
+            verifyLink : `http://localhost:8080/auth/verify-account/${token}`,
+        }
+
+        const transporter = await nodemailer.createTransport(configMail);
+        const mail = {
+            to : user.email,
+            from : 'anonnymous@gmail.com',
+            subject : 'Email Verification',
+            html : mustache.render(template,varTemp)
+        }
+        transporter.sendMail(mail);
+    } catch(err) {
+        console.log(err);
     }
 }
 
@@ -69,6 +128,7 @@ const delFromLiked = async (bookId) => {
 }
 
 module.exports = {
+    sendEmailVerify,
     compareDay,
     sendLog,
     getGenre,
