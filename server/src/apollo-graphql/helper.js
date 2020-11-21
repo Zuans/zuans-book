@@ -12,7 +12,6 @@ const path = require('path');
 const jwt = require('jsonwebtoken');
 
 
-
 const sendLog = async (description) => {
     console.log('log Worked')
     try {
@@ -41,12 +40,15 @@ const genereteToken = async ( id,email,password ) => {
 const sendEmailVerify = async (user) => {
     try {
         const template = await readFileSync(path.join(__dirname,'../template/email.html'),'utf8');
-        const pass = process.env.EMAIL_PASS;
+        const clientSecret = process.env.CLIENT_SECRET;
         const configMail = {
             service : 'gmail',
             auth : {
+                type : 'oAuth2',
                 user : 'juandev.net@gmail.com',
-                pass : pass,
+                clientId : '443211485701-eg14qok8s33gd50q6h35e4bbv71shr6c.apps.googleusercontent.com',
+                clientSecret : clientSecret,
+                refreshToken : '1//04dMYt26LgOszCgYIARAAGAQSNwF-L9Ir0Stk9fMHzZ9xVl_5i9dLTRIgLBbENkW1mLZmfJ6HQc9olMcNSLVMTE11quzBCRu6_4g',
             }
         };
 
