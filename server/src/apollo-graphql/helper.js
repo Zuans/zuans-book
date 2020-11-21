@@ -62,7 +62,7 @@ const sendEmailVerify = async (user) => {
         const varTemp = {
             username,
             email,
-            verifyLink : `http://localhost:8080/auth/verify-account/${token}`,
+            verifyLink : `https://zuans-book77.herokuapp.com//auth/verify-account/${token}`,
         }
 
         const transporter = await nodemailer.createTransport(configMail);
