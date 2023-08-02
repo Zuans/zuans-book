@@ -32,11 +32,9 @@ const errorType = {
 
 
 const graphqlError =  (errorMsg ) => {
-  console.log(errorMsg);
   const dupEmail = errorMsg.match(/\bdup\s\bkey/i);
   if(dupEmail) return errorType.EMAIL_DUPLICATE;
   const error = errorType[errorMsg];
-  console.log(error);
   return error;
 }
 
